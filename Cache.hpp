@@ -10,6 +10,7 @@
 #include <iostream>
 #include <bitset>
 #include <cmath>
+#include <sstream>
 
 struct Block{ //Contains one block of valid, dirty, tag, index and offset bits
     std::vector<bool> valid={0}; //valid bit 
@@ -57,16 +58,30 @@ struct Cache{
 };
 
 struct Cache_Simulator{
-    std::vector<std::vector<std::string,int>> instructions;
+    // std::vector<std::vector<std::string,std::bitset<32>>> instructions;
+    std::ifstream file;
 
-    Cache_Simulator(std::ifstream &file, int BLOCKSIZE, int L1_Size, int L1_Assoc, int L2_Size, int L2_Assoc){
+    Cache_Simulator(const std::string& filename, int BLOCKSIZE, int L1_Size, int L1_Assoc, int L2_Size, int L2_Assoc) : file(filename) 
+    {
         Cache L1 = Cache(BLOCKSIZE,L1_Size,L1_Assoc);
         Cache L2 = Cache(BLOCKSIZE,L2_Size,L2_Assoc);
-
     }
 
-    void constructInstructions(){
-        //function to read file and append into instructions in the format of [["r/w",address1],["r/w",address2],so on]
+    void StartSimulator(){
+        //function to read file and call MemoryManager
+        if (!file.is_open()){ std::cout << "Error in opening file" << "/n" ;}
+        else{
+            std::string line;
+            while (std::getline(file,line)){
+                std::istringstream iss(line);
+                std::string word1, word2;
+                iss >> word1 >> std::ws >> word2;
+                unsigned long long num = std::stoull(word2.c_str(), nullptr, 16);
+                if (word1.c_str()=="r"){L1_Read();}
+                else{L1_Write();}
+            }
+            file.close();
+        }
     }
 
     void MemoryManager(){
