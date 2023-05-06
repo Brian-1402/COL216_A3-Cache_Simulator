@@ -37,8 +37,11 @@ struct Set{ //Contains a aset which is the collection of Blocks (Number of Block
 
 struct Cache{
     std::vector<Set> cache;
+    int indexnum; //a variable to store number of bits for index
+    int tagnum; //a variable to store number of bits for tag
     int setnum; //a variable to store the number of sets
     int associativity; //a variable to store the set asssociativity of the Cache
+    int offsetnum; //a variable to store number of bits required for offset
     int reads;
     int readmisses;
     int writes;
@@ -47,10 +50,11 @@ struct Cache{
     int writebacks;
 
     Cache(int Block_size, int Cache_size, int assoc) {
-        int setnum = static_cast<int>(Cache_size/(assoc*Block_size)); //Number of sets
-        int associativity = assoc;
-        int indexnum = static_cast<int>(log2(setnum));                //Number of bits for sets
-        int offsetnum = static_cast<int>(log2(Block_size));           //Number of bits for offset
+        setnum = static_cast<int>(Cache_size/(assoc*Block_size)); //Number of sets
+        associativity = assoc;
+        indexnum = static_cast<int>(log2(setnum));                //Number of bits for sets
+        offsetnum = static_cast<int>(log2(Block_size));           //Number of bits for offset
+        tagnum = 32-indexnum-offsetnum;
         for (int i=1;i<=setnum;i++){
             cache.push_back(Set(indexnum,offsetnum,assoc));           //Adding sets to cache vector
         }
@@ -77,17 +81,20 @@ struct Cache_Simulator{
                 std::string word1, word2;
                 iss >> word1 >> std::ws >> word2;
                 unsigned long long num = std::stoull(word2.c_str(), nullptr, 16);
-                if (word1.c_str()=="r"){L1_Read();}
-                else{L1_Write();}
+                std::bitset<32> address(num);
+                MemoryManager(word1,address);
             }
             file.close();
         }
     }
 
-    void MemoryManager(){
+    void MemoryManager(std::string &type, std::bitset<32> address){
         //Divide into L1 index, L1 block, L1 tag, L2 index, L2 block, L2 tag
         //if "r" then L1_Read()
         //else L1_Write()
+        if (type.c_str()=="r") {L1_Read();}
+        else {L1_Write();}
+
     }
 
     void convert(){
