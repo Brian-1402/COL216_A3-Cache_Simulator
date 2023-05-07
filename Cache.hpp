@@ -70,6 +70,8 @@ struct Cache_Simulator
 {
     // std::vector<std::vector<std::string,std::bitset<32>>> instructions;
     std::ifstream file;
+    Cache L1;
+    Cache L2;
 
     Cache_Simulator(const std::string &filename, int BLOCKSIZE, int L1_Size, int L1_Assoc, int L2_Size, int L2_Assoc) : file(filename)
     {
@@ -91,19 +93,25 @@ struct Cache_Simulator
             while (std::getline(file, line))
             {
                 std::istringstream iss(line);
-                std::string word1, word2;
+                std::string word1, word2, address;
                 iss >> word1 >> std::ws >> word2;
-                unsigned long long num = std::stoull(word2.c_str(), nullptr, 16);
-                std::bitset<32> address(num);
+                int hex_int = std::stoi(word2, nullptr, 16);
+                // convert integer to binary string
+                address = std::bitset<32>(hex_int).to_string();
                 MemoryManager(word1, address);
             }
             file.close();
         }
     }
 
-    void MemoryManager(std::string &type, std::bitset<32> address)
+    void MemoryManager(std::string &type, std::string address)
     {
         // Divide into L1 index, L1 block, L1 tag, L2 index, L2 block, L2 tag
+        std::string L1tagbits = address.substr(0, L1.tagnum);
+        std::string L1indexbits = address.substr(L1.tagnum, L1.indexnum);
+        std::string L2tagbits = address.substr(0, L2.tagnum);
+        std::string L2indexbits = address.substr(L2.tagnum, L2.indexnum);
+
         // if "r" then L1_Read()
         // else L1_Write()
         if (type.c_str() == "r")
