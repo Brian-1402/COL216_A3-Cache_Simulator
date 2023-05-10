@@ -12,8 +12,9 @@
 #include <cmath>
 #include <sstream>
 #include <iomanip>
-#include <cstring>
 #include <algorithm>
+#include <cstring>
+
 
 struct Block
 {                                  // Contains one block of valid, dirty, tag, index and offset bits
