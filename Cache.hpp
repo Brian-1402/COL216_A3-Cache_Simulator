@@ -52,12 +52,12 @@ struct Cache
     int setnum;        // a variable to store the number of sets
     int associativity; // a variable to store the set asssociativity of the Cache
     int offsetnum;     // a variable to store number of bits required for offset
-    int reads;
-    int readmisses;
-    int writes;
-    int writemisses;
-    int missrate;
-    int writebacks;
+    int reads = 0;
+    int readmisses = 0;
+    int writes = 0;
+    int writemisses = 0;
+    int missrate = 0;
+    int writebacks = 0;
 
     Cache(int Block_size, int Cache_size, int assoc)
     {
@@ -124,7 +124,7 @@ struct Cache_Simulator
 
         // if "r" then L1_Read()
         // else L1_Write()
-        if (type.c_str() == "r")
+        if (type == "r")
         {
             L1_Read(L1tagbits, L1indexbits, L2tagbits, L2indexbits);
         }
@@ -184,22 +184,25 @@ struct Cache_Simulator
                 B.tag = L1tagbits;       //set the tag bits as the required one
                 B.index = L1indexbits;   //set the index bits as required one
                 B.valid = "1";           //set the valid bit for this block
-                LRU_update(L1Set.LRU,i);   //update LRU             
+                LRU_update(L1Set.LRU,i);   //update LRU    
+                break;         
             }
 
             //else if its valid then:
             else{
                 if (i!=L1.associativity-1){ //if its not the last block then its possible that either this contains data or the future blocks have an invalid bit
                     if (B.tag == L1tagbits){ //This is the data we need
-                    L1.reads += 1;           //update L1.reads
-                    LRU_update(L1Set.LRU,i);   //update LRU
+                        L1.reads += 1;           //update L1.reads
+                        LRU_update(L1Set.LRU,i);   //update LRU
+                        break;
                     }
                     continue;                //in both cases continue to next iteration
                 }
                 else{                        //This means that now we are in the last block so if tag doesnt match with this then we have to replace the least recently used (LRU) block
                     if (B.tag == L1tagbits){ //This is the data we need
-                    L1.reads += 1;           //update L1.reads
-                    LRU_update(L1Set.LRU,i);   //update LRU
+                        L1.reads += 1;           //update L1.reads
+                        LRU_update(L1Set.LRU,i);   //update LRU
+                        break;
                     }
                     else{
                         L1.reads +=1;            //update the reads (since its trying to be read -> according to testcase result on piazza)
@@ -207,6 +210,7 @@ struct Cache_Simulator
                         L2_Read(L2tagbits, L2indexbits); //Read from L2
                         L1_Replace(L1Set, L1tagbits, L1indexbits);//set the tag bits of the least recently used block (done in Replace function to incorporate writebacks) 
                         LRU_update(L1Set.LRU,L1Set.LRU[0]);   //update LRU  -> note that the most recently used will now be the LRU[0] because that is where the new tagbits come in
+                        break;
                     }
                 }
             }
@@ -231,7 +235,7 @@ struct Cache_Simulator
             Block B = L1Set.set[i];              //Getting ith block of set
 
             //if invalid then use this block for write
-            if (B.valid.c_str() == "0"){ //if the present block being written has no data then:
+            if (B.valid == "0"){ //if the present block being written has no data then:
                 L1.writes +=1;            //update the writes (since its trying to be written -> according to testcase result on piazza))
                 L1.writemisses += 1;      //update L1 read miss since we are going to L2      
                 L2_Read(L2tagbits, L2indexbits); //Read from L2 (I am guessing that we read from L2, write on L1)
@@ -239,24 +243,27 @@ struct Cache_Simulator
                 B.index = L1indexbits;   //set the index bits as the required one
                 B.valid = "1";           //set the valid bit for this block
                 B.dirty = "1";           //set the dirty bit since its now differing from other memory data value
-                LRU_update(L1Set.LRU,i);   //update LRU             
+                LRU_update(L1Set.LRU,i);   //update LRU   
+                break;          
             }
 
             //else if its valid then:
             else{
                 if (i!=L1.associativity-1){ //if its not the last block then its possible that either this contains data or the future blocks have an invalid bit
                     if (B.tag == L1tagbits){ //This is the data we need
-                    L1.writes += 1;           //update L1.writes
-                    B.dirty = "1";            //data is written so now its dirty -> incase for multi processors we can also make the corresponding L2.valid bit invalid ig
-                    LRU_update(L1Set.LRU,i);    //update LRU
+                        L1.writes += 1;           //update L1.writes
+                        B.dirty = "1";            //data is written so now its dirty -> incase for multi processors we can also make the corresponding L2.valid bit invalid ig
+                        LRU_update(L1Set.LRU,i);    //update LRU
+                        break;
                     }
                     continue;                //in both cases continue to next iteration
                 }
                 else{                        //This means that now we are in the last block so if tag doesnt match with this then we have to replace the least recently used (LRU) block
                     if (B.tag == L1tagbits){ //This is the data we need
-                    L1.writes += 1;           //update L1.reads
-                    B.dirty = "1";            //data is written so now its dirty -> incase for multi processors we can also make the corresponding L2.valid bit invalid ig
-                    LRU_update(L1Set.LRU,i);   //update LRU
+                        L1.writes += 1;           //update L1.reads
+                        B.dirty = "1";            //data is written so now its dirty -> incase for multi processors we can also make the corresponding L2.valid bit invalid ig
+                        LRU_update(L1Set.LRU,i);   //update LRU
+                        break;
                     }
                     else{
                         L1.writes +=1;            //update the writes (since its trying to be written onto -> according to testcase result on piazza)
@@ -265,6 +272,7 @@ struct Cache_Simulator
                         L1_Replace(L1Set, L1tagbits, L1indexbits);//set the tag bits of the least recently used block (done in Replace function to incorporate writebacks)
                         L1Set.set[L1Set.LRU[0]].dirty = "1";  //updated dirty bit of this block
                         LRU_update(L1Set.LRU,L1Set.LRU[0]);   //update LRU  -> note that the most recently used will now be the LRU[0] because that is where the new tagbits come in  
+                        break;
                     }
                 }
             }
@@ -320,29 +328,33 @@ struct Cache_Simulator
                 B.tag = L2tagbits;       //set the tag bits as the required one
                 B.index = L2indexbits;   //set the index bits as required one
                 B.valid = "1";           //set the valid bit for this block
-                LRU_update(L2Set.LRU,i);   //update LRU             
+                LRU_update(L2Set.LRU,i);   //update LRU  
+                break;           
             }
 
             //else if its valid then:
             else{
                 if (i!=L2.associativity-1){ //if its not the last block then its possible that either this contains data or the future blocks have an invalid bit
                     if (B.tag == L2tagbits){ //This is the data we need
-                    L2.reads += 1;           //update L2.reads
-                    LRU_update(L2Set.LRU,i);   //update LRU
+                        L2.reads += 1;           //update L2.reads
+                        LRU_update(L2Set.LRU,i);   //update LRU
+                        break;
                     }
                     continue;                //in both cases continue to next iteration
                 }
                 else{                        //This means that now we are in the last block so if tag doesnt match with this then we have to replace the least recently used (LRU) block
                     if (B.tag == L2tagbits){ //This is the data we need
-                    L2.reads += 1;           //update L2.reads
-                    LRU_update(L2Set.LRU,i);   //update LRU
+                        L2.reads += 1;           //update L2.reads
+                        LRU_update(L2Set.LRU,i);   //update LRU
+                        break;
                     }
                     else{
                         L2.reads +=1;            //update the reads (since its trying to be read -> according to testcase result on piazza)
                         L2.readmisses += 1;      //update L2 read miss since we are going to DRAM     
                         // L2_Read(L1tagbits, L1indexbits, L2tagbits, L2indexbits); //Read from L2
                         L2_Replace(L2Set, L2tagbits, L2indexbits);//set the tag bits of the least recently used block (done in Replace function to incorporate writebacks)
-                        LRU_update(L2Set.LRU,L2Set.LRU[0]);   //update LRU  
+                        LRU_update(L2Set.LRU,L2Set.LRU[0]);   //update LRU 
+                        break; 
                     }
                 }
             }
@@ -376,6 +388,7 @@ struct Cache_Simulator
                 L2.writes += 1;           //update L2.writes
                 B.dirty = "1";            //set dirty bit as value is now modified
                 LRU_update(L2Set.LRU,i);    //update LRU
+                break;
             }
 
         }
