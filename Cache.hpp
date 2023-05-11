@@ -102,7 +102,7 @@ struct Cache_Simulator
                 std::istringstream iss(line);
                 std::string word1, word2, address;
                 iss >> word1 >> std::ws >> word2;
-                int hex_int = std::stoi(word2, nullptr, 16);
+                long long hex_int = std::stoll(word2, nullptr, 16);
                 // convert integer to binary string
                 address = std::bitset<64>(hex_int).to_string();
                 MemoryManager(word1, address);
