@@ -481,23 +481,23 @@ struct Cache_Simulator
 
     void printfinalans()
     {
-        // std::cout << "\n\n===== Simulation Results =====";
-        // std::cout << "\ni. number of L1 reads:\t\t\t\t" << std::dec << L1.reads;
-        // std::cout << "\nii. number of L1 read misses:\t\t\t" << std::dec << L1.readmisses;
-        // std::cout << "\niii. number of L1 writes:\t\t\t" << std::dec << L1.writes;
-        // std::cout << "\niv. number of L1 write misses:\t\t\t" << std::dec << L1.writemisses;
-        // std::cout << "\nv. L1 miss rate:\t\t\t\t" << std::fixed << std::setprecision(4) << ((float)L1.readmisses + (float)L1.writemisses) / (L1.reads + L1.writes);
-        // std::cout << "\nvi. number of writebacks from L1 memory:\t" << std::dec << L1.writebacks;
+        std::cout << "\n\n===== Simulation Results =====";
+        std::cout << "\ni. number of L1 reads:\t\t\t\t" << std::dec << L1.reads;
+        std::cout << "\nii. number of L1 read misses:\t\t\t" << std::dec << L1.readmisses;
+        std::cout << "\niii. number of L1 writes:\t\t\t" << std::dec << L1.writes;
+        std::cout << "\niv. number of L1 write misses:\t\t\t" << std::dec << L1.writemisses;
+        std::cout << "\nv. L1 miss rate:\t\t\t\t" << std::fixed << std::setprecision(4) << ((float)L1.readmisses + (float)L1.writemisses) / (L1.reads + L1.writes);
+        std::cout << "\nvi. number of writebacks from L1 memory:\t" << std::dec << L1.writebacks;
 
         if (L2_SIZE != 0)
         {
-            // std::cout << "\nvii. number of L2 reads:\t\t\t" << std::dec << L2.reads;
-            // std::cout << "\nviii. number of L2 read misses:\t\t\t" << std::dec << L2.readmisses;
-            // std::cout << "\nix. number of L2 writes:\t\t\t" << std::dec << L2.writes;
-            // std::cout << "\nx. number of L2 write misses:\t\t\t" << std::dec << L2.writemisses;
-            // std::cout << "\nxi. L2 miss rate:\t\t\t\t" << std::fixed << std::setprecision(4) << ((float)L2.readmisses + (float)L2.writemisses) / (L2.reads + L2.writes);
-            // std::cout << "\nxii. number of writebacks from L2 memory:\t" << std::dec << L2.writebacks;
-            std::cout << "\nxiii. The total access time is:\t\t\t" << std::dec << ((float)1*(L1.reads + L1.writes) + (float)20*(L2.reads + L2.writes) + (float)200*(L2.readmisses + L2.writemisses + L2.writebacks))/1000 << " ns\n\n";
+            std::cout << "\nvii. number of L2 reads:\t\t\t" << std::dec << L2.reads;
+            std::cout << "\nviii. number of L2 read misses:\t\t\t" << std::dec << L2.readmisses;
+            std::cout << "\nix. number of L2 writes:\t\t\t" << std::dec << L2.writes;
+            std::cout << "\nx. number of L2 write misses:\t\t\t" << std::dec << L2.writemisses;
+            std::cout << "\nxi. L2 miss rate:\t\t\t\t" << std::fixed << std::setprecision(4) << ((float)L2.readmisses + (float)L2.writemisses) / (L2.reads + L2.writes);
+            std::cout << "\nxii. number of writebacks from L2 memory:\t" << std::dec << L2.writebacks;
+            std::cout << "\nxiii. The total access time is:\t\t\t" << std::dec << ((float)1*(L1.reads + L1.writes) + (float)20*(L2.reads + L2.writes) + (float)200*(L2.readmisses + L2.writemisses + L2.writebacks))/1000 << " us\n\n";
         }
     }
 
