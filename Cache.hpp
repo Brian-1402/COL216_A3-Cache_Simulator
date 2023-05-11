@@ -106,10 +106,10 @@ struct Cache_Simulator
                 // convert integer to binary string
                 address = std::bitset<64>(hex_int).to_string();
                 MemoryManager(word1, address);
-                // std::cout << "Line: " << line << "\n";
-                // printstate();
-                // printfinalans();
-                // std::cout << "\n";
+                std::cout << "Line: " << line << "\n";
+                printstate();
+                printfinalans();
+                std::cout << "\n";
             }
             printfinalans();
 
@@ -182,7 +182,7 @@ struct Cache_Simulator
         { // number of blocks = set associativity of cache -> check whether any tag matches along with valid bit
             // Block B = L1.cache[L1index].set[i]; // Getting ith block of set
 
-            // if invalid then use this block for read
+            // if invalid then use this block for read. NOTE: assumes that earlier iterations were all valid so reaching here means all valid blocks checked and missed, so it is an L1 read miss
             if (L1.cache[L1index].set[i].valid == "0")
             {                                                 // if the present block being read has no data then:
                 L1.reads += 1;                                // update the reads (since its trying to be read -> according to testcase result on piazza))
@@ -311,7 +311,8 @@ struct Cache_Simulator
 
         int LRUindex = (*L1Set).LRU[0];
         // Block B = (*L1Set).set[LRUindex];
-        std::string address = L1tagbits + L1indexbits;                        // got to get back the orginal memory address using Block B's tag and index (dont care about offset)
+        // std::string address = L1tagbits + L1indexbits;                        // got to get back the orginal memory address using Block B's tag and index (dont care about offset)
+        std::string address = (*L1Set).set[LRUindex].tag + (*L1Set).set[LRUindex].index;
         std::string Corr_L2tagbit = address.substr(0, L2.tagnum);             // now we can get corresponding tagbits in L2
         std::string Corr_L2indexbit = address.substr(L2.tagnum, L2.indexnum); // similarly corresponding indexbits in L2
 
