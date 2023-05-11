@@ -273,8 +273,8 @@ struct Cache_Simulator
             {
                 L1.writes += 1;                                               // update the writes (since its trying to be written onto -> according to testcase result on piazza)
                 L1.writemisses += 1;                                          // update L1 write miss since we are going to L2
-                L2_Read(L2tagbits, L2indexbits);                              // Read from L2 (I am guessing that we read from L2, write on L1)
                 L1_Replace(&L1.cache[L1index], L1tagbits, L1indexbits);       // set the tag bits of the least recently used block (done in Replace function to incorporate writebacks)
+                L2_Read(L2tagbits, L2indexbits);                              // Read from L2 (I am guessing that we read from L2, write on L1)
                 L1.cache[L1index].set[L1.cache[L1index].LRU[0]].dirty = "1";  // updated dirty bit of this block
                 LRU_update(&L1.cache[L1index].LRU, L1.cache[L1index].LRU[0]); // update LRU  -> note that the most recently used will now be the LRU[0] because that is where the new tagbits come in
             }
