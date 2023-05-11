@@ -33,3 +33,4 @@
 
 .vscode
 cache_simulate
+memory_trace_files/
